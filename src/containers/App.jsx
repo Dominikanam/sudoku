@@ -1,10 +1,8 @@
 import React, { PureComponent } from 'react';
-import uuid from 'uuid';
 import { hot } from 'react-hot-loader';
-import Title from '../components/Title.jsx';
-import TodoList from '../components/TodoList.jsx';
-import TodoForm from '../components/TodoForm.jsx';
-import todos from '../data/todoList';
+import Sudoku from 'sudoku-umd';
+import Board from '../components/Board.jsx';
+import Status from '../components/Status.jsx';
 import style from './App.css';
 
 class App extends PureComponent {
@@ -12,34 +10,96 @@ class App extends PureComponent {
         super(props);
 
 		this.state = {
-            data: todos
+			initialBoard: [],
+			board: [],
+			check: false,
+			correct: false
 		};
 
-		this.removeTodo = this.removeTodo.bind(this);
-		this.addTodo = this.addTodo.bind(this);
-    }
-
-	addTodo(val){
-        const todo = {
-            text: val,
-            id: uuid.v4(),
-        };
-        const data = [...this.state.data, todo];
-        this.setState({data});
+		this.newGame = this.newGame.bind(this);
+		this.reset = this.reset.bind(this);
+		this.solve = this.solve.bind(this);
+		this.check = this.check.bind(this);
+		this.onChange = this.onChange.bind(this);
 	}
 
-	removeTodo(id) {
-		const remainder = this.state.data.filter(todo => todo.id !== id);
-		this.setState({data: remainder});
+	componentDidMount() {
+		this.newGame();
+	}
+
+	convertToArray(string) {
+		return string.split('').map(value => value === '.' ? '' : value);
+	}
+
+	convertToString(array) {
+		return array.map(value => value || '.').join('');
+	}
+
+	reset() {
+		this.setState({
+			board: this.state.initialBoard,
+			check: false
+		});
+	}
+
+	solve() {
+		const solved = Sudoku.solve(this.convertToString(this.state.board));
+
+		if (!solved)
+			return;
+
+		this.setState({
+			board: this.convertToArray(solved),
+			check: false
+		});
+	}
+
+	check() {
+		this.setState({
+			check: true,
+			correct: Boolean(Sudoku.solve(this.convertToString(this.state.board)))
+		});
+	}
+
+	newGame() {
+		const board = this.convertToArray(Sudoku.generate(70));
+		this.setState({
+			board,
+			check: false,
+			initialBoard: board
+		});
+	}
+
+	onChange(selectedIndex, newValue) {
+		this.setState({
+			board: this.state.board.map((value, index) =>
+				index === selectedIndex ? newValue : value),
+			check: false
+		});
 	}
 
 	render() {
+		const { initialBoard, board, check, correct } = this.state;
+
 		return (
-			<div className={style.TodoApp}>
-				<Title title={`To do: ${this.state.data.length}`} />
-				<TodoList todos={this.state.data} remove={this.removeTodo} />
-				<TodoForm onAdd={this.addTodo} />
-			</div>
+			<section className={style.root}>
+				<h1>Sudoku</h1>
+
+				{board.length > 0
+					&& <Board
+						current={board}
+						initial={initialBoard}
+						onChange={this.onChange} />}
+
+				{check && <Status correct={correct} />}
+
+				<div className={style.buttons}>
+					<button onClick={this.check}>Check</button>
+					<button onClick={this.newGame}>New Game</button>
+					<button onClick={this.solve}>Solve</button>
+					<button onClick={this.reset}>Restart</button>
+				</div>
+			</section>
 		);
 	}
 }

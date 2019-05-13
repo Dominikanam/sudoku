@@ -1,13 +1,23 @@
-.TodoApp {
-	background-image: url(../images/note.png);
-    background-color: #F5F5F5;
-    color: #222;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    justify-content: center;
-    align-items: center;
-    align-content: center;
-    width: 100vw;
-    height: 100vh;
+.root {
+	display: block;
+}
+
+.root h1 {
+	text-align: center;
+}
+
+.root .buttons {
+	display: flex;
+	margin: 10px auto;
+	justify-content: center;
+}
+
+.root .buttons button {
+	margin: 10px;
+	color: white;
+	background-color: purple;
+	border-radius: 10px;
+	border: none;
+	font-weight: bold;
+	padding: 10px;
 }
