@@ -12,8 +12,6 @@ export default class Board extends PureComponent {
 
 	render() {
 		const { current, initial, onChange } = this.props;
-		console.log(current);
-		console.log(initial);
 
 		return (
 			<section className={styles.root}>

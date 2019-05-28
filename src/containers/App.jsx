@@ -71,9 +71,17 @@ class App extends PureComponent {
 	}
 
 	onChange(selectedIndex, newValue) {
+		let verifiedValue = newValue;
+
+		if (newValue > 9) {
+			verifiedValue = 9;
+		} else if (newValue < 1) {
+			verifiedValue = 1;
+		}
+
 		this.setState({
 			board: this.state.board.map((value, index) =>
-				index === selectedIndex ? newValue : value),
+				index === selectedIndex ? verifiedValue : value),
 			check: false
 		});
 	}
